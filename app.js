@@ -7,7 +7,9 @@ var bodyParser = require("body-parser");
 
 var bundler = require("./middleware/bundler");
 
+
 var app = express();
+app.use(express.static(path.join(__dirname, 'public')));
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + "/public/favicon.ico"));

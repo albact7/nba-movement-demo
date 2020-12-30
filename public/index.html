@@ -1,25 +1,30 @@
 <!doctype html>
-  <head>
+
+<head>
     <meta charset="utf-8">
     <title>Movement</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
-    <style>
-      svg {
-        background-image: url(http://stats.nba.com/media/img/fullcourt.svg);
-        background-size: cover;
-      }
-    </style>
-  </head>
-  <body>
+
+    <link rel="stylesheet" type="text/css" href="./src/style.css">
+</head>
+
+<body>
     <div>
-      <button id="play-pause">Play/Pause</button>
+        <button id="play-pause">Play/Pause</button>
     </div>
     <pre>
+      Quarter: <span id="quarter"></span>
       Game clock: <span id="game-clock"></span>
       Shot clock: <span id="shot-clock"></span>
       Ball height: <span id="ball-height"></span>
     </pre>
+    <p>Choose quarter <input type="number" id="quarter-number" name="quarter-number" min="1" max="4" value="1"></p>
+    <p>Choose minute <input type="number" id="minute" name="minute" min="0" max="11" value="11"></p>
+    <div class="slidecontainer">
+        <input type="range" min="0" max="720" value="0" class="slider" id="myRange2">
+    </div>
     <script src="./bundle.js"></script>
-  </body>
+</body>
+
 </html>

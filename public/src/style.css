@@ -1,0 +1,8 @@
+.slider {
+    width: 90%;
+}
+
+svg {
+    background-image: url(http://stats.nba.com/media/img/fullcourt.svg);
+    background-size: cover;
+}
