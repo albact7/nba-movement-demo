@@ -132317,7 +132317,6 @@ let isPaused = false;
 main();
 
 function main() {
-
     fetch("/data/plays.json")
         .then(res => res.text())
         .then(text => text.trim().split("\n"))
@@ -132418,7 +132417,7 @@ minute.oninput = function() {
 }
 
 function queueDrawing(events) {
-    processEvents(events)
+    processEvents(events[0])
     slider2.max = fullMoments['fullMomentsQ' + quarterN][0]['min' + minuteN].length - 1
     drawMoment(fullMoments['fullMomentsQ' + quarterN][0]['min' + minuteN][minuteN]);
 }
@@ -132485,9 +132484,15 @@ function getEmptyListOfLists() {
 }
 
 function Event(data) {
-    const players = team(data.home).concat(team(data.visitor));
-    const moments = data.moments.map(movement.Moment);
-    return { players, moments }
+    data = data.events
+    var events = []
+    data.forEach(element => {
+        var players = team(element.home).concat(team(element.visitor));
+        var moments = element.moments.map(movement.Moment);
+        events.push({ players, moments })
+    });
+
+    return events
 }
 
 function removeSvg() {
@@ -132514,7 +132519,7 @@ function shotClock(moment) {
 
 function ballHeight(moment) {
     let ball = R.find(R.whereEq({ type: "ball" }), moment.coordinates);
-    bh.textContent = ball.radius;
+    bh.textContent = ball.z;
 }
 
 function quarter(moment) {
