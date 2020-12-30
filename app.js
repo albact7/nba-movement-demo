@@ -1,55 +1,31 @@
-var express = require("express");
-var path = require("path");
-var favicon = require("serve-favicon");
-var logger = require("morgan");
-var cookieParser = require("cookie-parser");
-var bodyParser = require("body-parser");
-
-var bundler = require("./middleware/bundler");
-
-
-var app = express();
-app.use(express.static(path.join(__dirname, 'public')));
-
-// uncomment after placing your favicon in /public
-//app.use(favicon(__dirname + "/public/favicon.ico"));
-app.use(logger("dev"));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(bundler);
-app.use(express.static(path.join(__dirname, "public")));
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    var err = new Error("Not Found");
-    err.status = 404;
-    next(err);
+var fs = require('fs');
+const express = require('express')
+const app = express()
+var browserify = require('browserify');
+var watchify = require('watchify');
+var babelify = require('babelify');
+var b = browserify({
+    entries: ['views/index.js'],
+    cache: {},
+    packageCache: {},
+    plugin: [watchify]
 });
 
-// error handlers
+b.on('update', bundle);
+bundle();
 
-// development error handler
-// will print stacktrace
-if (app.get("env") === "development") {
-    app.use(function(err, req, res, next) {
-        res.status(err.status || 500);
-        res.json({
-            message: err.message,
-            error: err
-        });
-    });
+function bundle() {
+    b.bundle()
+        .on('error', console.error)
+        .pipe(fs.createWriteStream('./views/bundle.js'));
 }
 
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.json({
-        message: err.message,
-        error: {}
-    });
-});
+app.use(express.static(__dirname + '/views'));
 
+//app.set('view engine', 'pug')
+app.set('views', './views')
+app.get('/', (req, res) => {
+    res.render("./views/index.html", { root: __dirname })
+})
 
-module.exports = app;
+app.listen(4444, () => console.log("Listening on port 4444"))

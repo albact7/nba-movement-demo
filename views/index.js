@@ -32,8 +32,6 @@ function main() {
 }
 
 function drawMoment(moment) {
-
-    console.log(moment['quarter'])
     removeSvg();
 
     gameClock(moment);
@@ -45,19 +43,38 @@ function drawMoment(moment) {
         .attr("width", WIDTH * MULTIPLIER)
         .attr("height", HEIGHT * MULTIPLIER);
 
-    svgNode = svg[0][0];
+    svgNode = svg._groups[0][0];
 
+    var radius = 10;
     svg.selectAll(".player")
         .data(moment.coordinates).enter()
         .append("circle")
         .attr("class", "dot")
-        .attr("r", 6)
+        .attr("r", function(c) {
+            if (c.type === "ball") return radius - 4;
+            return radius;
+        })
         .attr("cx", c => c.x * MULTIPLIER)
         .attr("cy", c => c.y * MULTIPLIER)
         .style("fill", function(c) {
             if (c.type === "ball") return "black";
-            if (c.teamId === 1610612766) return "red";
-            return "blue";
+            if (c.teamId === 1610612766) return "#FDB3B3";
+            return "#AEBEFF";
+        });
+
+    var texts = svg.selectAll(".myTexts")
+        .data(moment.coordinates)
+        .enter()
+        .append("text");
+
+    texts.attr("x", c => c.x * MULTIPLIER - radius / 2)
+        .attr("y", c => c.y * MULTIPLIER + radius / 2)
+        .style("fill", "black")
+        .style("font-size", "12px")
+        .style("font-family", "Arial, Helvetica, sans-serif")
+        .text(function(c) {
+            if (c.type === "ball") return "";
+            return labelPlayer(c.playerId);
         });
 }
 
@@ -74,7 +91,7 @@ function team(rawTeam) {
     }));
 }
 
-
+var fullPlayers = [];
 
 var fullMomentsQ1 = [];
 var fullMomentsQ2 = [];
@@ -99,7 +116,6 @@ quarterNumber.oninput = function() {
 }
 
 minute.oninput = function() {
-    console.log(fullMoments['fullMomentsQ' + quarterN])
     minuteN = this.value
     slider2.max = fullMoments['fullMomentsQ' + quarterN][0]['min' + minuteN].length - 1
     slider2.value = 0
@@ -112,14 +128,18 @@ function queueDrawing(events) {
     drawMoment(fullMoments['fullMomentsQ' + quarterN][0]['min' + minuteN][minuteN]);
 }
 
+function labelPlayer(playerid) {
+    return fullPlayers.filter(pl => pl.playerId == playerid)[0]['jerseyNo']
+}
+
 function processEvents(events) {
     var totalGameTime = 0
 
     var current_q = 0
-    console.log(fullMoments)
+    fullPlayers = events[0]['players']
     for (var i = 0; i < events.length; i++) {
         var ev = events[i]
-        const { players, moments } = ev
+        var moments = ev['moments']
         for (var j = 0; j < moments.length; j += 2) {
             var moment = moments[j]
             if (current_q != moment['quarter']) {
@@ -135,7 +155,7 @@ function processEvents(events) {
             }
         }
     }
-    console.log(fullMoments)
+
     return fullMoments;
 }
 
